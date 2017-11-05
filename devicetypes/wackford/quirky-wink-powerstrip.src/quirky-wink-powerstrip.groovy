@@ -24,7 +24,82 @@
  *				Documented Header
  *
  *****************************************************************
- *                       Code
+ *     def powerstripEventHandler()
+{
+	log.debug "In Powerstrip Event Handler..."
+
+	def json = request.JSON
+	def outlets = json.outlets
+
+	outlets.each() {
+		def dni = getChildDevice(it.outlet_id)
+		pollOutlet(dni)   //sometimes events are stale, poll for all latest states
+	}
+
+	def html = """{"code":200,"message":"OK"}"""
+	render contentType: 'application/json', data: html
+}
+
+def pollOutlet(childDevice)
+{
+	log.debug "In pollOutlet"
+
+	//login()
+
+	log.debug "Polling powerstrip"
+	apiGet("/outlets/" + childDevice.device.deviceNetworkId) { response ->
+		def data = response.data.data
+		data.powered ? childDevice?.sendEvent(name:"switch",value:"on") :
+			childDevice?.sendEvent(name:"switch",value:"off")
+	}
+}
+
+def on(childDevice)
+{
+	//login()
+
+	apiPut("/outlets/" + childDevice.device.deviceNetworkId, [powered : true]) { response ->
+		def data = response.data.data
+		log.debug "Sending 'on' to device"
+	}
+}
+
+def off(childDevice)
+{
+	//login()
+
+	apiPut("/outlets/" + childDevice.device.deviceNetworkId, [powered : false]) { response ->
+		def data = response.data.data
+		log.debug "Sending 'off' to device"
+	}
+}
+
+def createPowerstripChildren(deviceData)
+{
+	log.debug "In createPowerstripChildren"
+
+	def powerstripName = deviceData.name
+	def deviceFile = "Quirky Wink Powerstrip"
+
+	deviceData.outlets.each {
+		createChildDevice( deviceFile, it.outlet_id, it.name, "$powerstripName ${it.name}" )
+	}
+}
+
+private Boolean canInstallLabs()
+{
+	return hasAllHubsOver("000.011.00603")
+}
+
+private Boolean hasAllHubsOver(String desiredFirmware)
+{
+	return realHubFirmwareVersions.every { fw -> fw >= desiredFirmware }
+}
+
+private List getRealHubFirmwareVersions()
+{
+	return location.hubs*.firmwareVersionString.findAll { it }
+}                  Code
  *****************************************************************
  */
 // for the UI
