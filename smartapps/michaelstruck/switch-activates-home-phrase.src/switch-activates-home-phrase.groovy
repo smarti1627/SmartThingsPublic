@@ -69,4 +69,3 @@ def switchHandler(evt) {
     	location.helloHome.execute(settings.phrase_off)
     }
 }
-

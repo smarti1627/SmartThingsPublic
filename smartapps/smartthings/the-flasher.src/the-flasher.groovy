@@ -39,8 +39,7 @@ preferences {
 	}
 	section("Time settings in milliseconds (optional)..."){
 		input "onFor", "number", title: "On for (default 1000)", required: false
-		input "offFor", "number", title: "Off for (default 1000)", required: false
-	}
+		input "offFor", "number", title: "Off for (default 1000)", required: false	}
 }
 
 def installed() {
