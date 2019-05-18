@@ -1,18 +1,4 @@
-/**
- *  Centralite Keypad
- *
- *  Copyright 2015 Mitch Pond
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License. You may obtain a copy of the License at:
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
- *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- *  for the specific language governing permissions and limitations under the License.
- *
- */
+
 metadata {
 	definition (name: "Centralite Keypad", namespace: "mitchpond", author: "Mitch Pond") {
 	capability "Battery"
@@ -62,31 +48,31 @@ metadata {
         	state "default", action:"configuration.configure", icon:"st.secondary.configure"
     	}
         main ("battery")
-        //TODO: armMode is in here for debug purposes. Remove later.
-        details (["temperature","battery","armMode","configure","refresh"])
+        
 	}
 }
 
-// parse events into attributes
+
+
 def parse(String description) {
 	log.debug "Parsing '${description}'";
     def results = [];
     
-	//------Miscellaneous Zigbee message------//
+	
 	if (description?.startsWith('catchall:')) {
     	//log.debug zigbee.parse(description);
 		def message = zigbee.parse(description);
         
-        //------Profile-wide command (rattr responses, errors, etc.)------//
+       
         if (message?.isClusterSpecific == false) {
-        	//------Default response------//
+        	
             if (message?.command == 0x0B) {
                 if (message?.data[1] == 0x81) 
                     log.error "Device: unrecognized command: "+description;
                 else if (message?.data[1] == 0x80) 
                     log.error "Device: malformed command: "+description;
             }
-            //------Read attributes responses------//
+           
             else if (message?.command == 0x01) {
             	if (message?.clusterId == 0x0402) {
 					log.debug "Device: read attribute response: "+description;
@@ -95,16 +81,12 @@ def parse(String description) {
             else 
             	log.debug "Unhandled profile-wide command: "+description;
         }
-        //------Cluster specific commands------//
+        
         else if (message?.isClusterSpecific) {
-        	//------IAS ACE------//
+        	
         	if (message?.clusterId == 0x0501) {
                 if (message?.command == 0x07) {
-                //---------------------------------------//
-                //Not sure what the device is doing here. It doesn't look like an ACE client should be sending this.
-                //Plus, the command isn't sent with a payload which doesn't seem to follow the spec.
-                //I'm assuming that they're using it as a sort of heartbeat (??)
-                //---------------------------------------//
+                
                     log.debug "${device.displayName} awake and requesting status"
                     results = sendStatusToDevice();
                     log.trace results
@@ -116,14 +98,14 @@ def parse(String description) {
         	}
             else log.debug "Unhandled cluster-specific command: "+description
         }
-	}
-    //------IAS Zone Enroll request------//
+	}IAS Zone Enroll re
+    
     else if (description?.startsWith('enroll request')) {
 		List cmds = enrollResponse()
 		log.debug "enroll response: ${cmds}"
 		results = cmds?.collect { new physicalgraph.device.HubAction(it) }
-	}
-    //------Read Attribute response------//
+	}//------R
+    ead Attribute response------//
     else if (description?.startsWith('read attr -')) {
 		results = parseReportAttributeMessage(description)
 	}

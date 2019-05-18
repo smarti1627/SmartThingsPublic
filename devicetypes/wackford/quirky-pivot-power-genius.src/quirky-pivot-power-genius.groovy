@@ -1,4 +1,33 @@
-
+/*  Quirky Pivot Power Genius
+ *
+ *  Author: todd@wackford.net
+ *  Date: 2014-01-28
+ *
+ *****************************************************************
+ *     Setup Namespace, acpabilities, attributes and commands
+ *****************************************************************
+ * Namespace:			"wackford"
+ *
+ * Capabilities:		"switch"
+ *						"polling"
+ *						"refresh"
+ *
+ * Custom Attributes:	"none"
+ *
+ * Custom Commands:		"none"
+ *
+ *****************************************************************
+ *                       Changes
+ *****************************************************************
+ *
+ *  Change 1:	2014-03-10
+ *				Documented Header
+ *
+ *****************************************************************
+ *                       Code
+ *****************************************************************
+ */
+ // for the UI
 metadata {
 	// Automatically generated. Make future change here.
 	definition (name: "Quirky Pivot Power Genius", namespace: "wackford", author: "todd@wackford.net", oauth: true) {
@@ -30,7 +59,7 @@ def parse(description) {
 	log.debug "parse() - $description"
 	def results = []
 	
-    if ( description == "updated" )
+    if ( description == "updated" ) on initial install we are returned just a string
     	return
         
 	if (description?.name && description?.value)
